@@ -10,7 +10,12 @@
 <meta property="og:title" content="Finance: a personal finance manager, built spec first">
 <meta property="og:description" content="Offline-first Flutter app on iOS, Android and the web. 33 feature specs, 1,900+ tests.">
 <meta property="og:url" content="https://phuchuynh2712.github.io/my-portfolio/finance/">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://phuchuynh2712.github.io/my-portfolio/assets/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Huỳnh Hữu Phúc, Senior Software Engineer, with two screens of the Finance app">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://phuchuynh2712.github.io/my-portfolio/assets/img/og.png">
 <meta name="theme-color" content="#073d28">
 <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -65,7 +70,7 @@
       <img class="phone" src="../assets/img/ks-plan-light.png" width="820" height="1728" alt="Plan screen: monthly income divided across groups and items">
       <img class="phone" src="../assets/img/ks-overview-light.png" width="820" height="1728" alt="Overview screen: total balance, accounts and recent transactions">
       <img class="phone" src="../assets/img/ks-wallet-light.png" width="820" height="1728" alt="Wallet screen: balance per item, with income and expense actions">
-      <img class="phone phone--dark" src="../assets/img/ks-overview-dark.png" width="820" height="1728" alt="Overview screen in dark theme">
+      <img class="phone" src="../assets/img/ks-expense-light.png" width="820" height="1728" alt="Expense entry: number pad, item picker and the balance left after the expense">
     </div>
   </div>
 </div>
@@ -78,7 +83,7 @@
   <div class="feature-grid">
     <article class="card feature"><p class="mono mono--accent">01</p><h3>A plan made of groups and items</h3><p>Each item takes a percentage or a fixed amount of income. One item is marked to receive whatever is left over, usually savings.</p></article>
     <article class="card feature"><p class="mono mono--accent">02</p><h3>Income allocates itself</h3><p>Record an income and the app splits it across the plan, so every item's balance is always current.</p></article>
-    <article class="card feature"><p class="mono mono--accent">03</p><h3>Fast expense entry</h3><p>A number pad and a list of items, with a live note of what will be left after the transaction. Receipts can be scanned.</p></article>
+    <article class="card feature"><p class="mono mono--accent">03</p><h3>Fast expense entry</h3><p>A number pad and a list of items, with a live note of what will be left after the transaction. On iOS and Android, receipts can be scanned on the device.</p></article>
     <article class="card feature"><p class="mono mono--accent">04</p><h3>History that stays honest</h3><p>A correction does not rewrite the past. It adds a reversing entry, so the audit trail stays intact and balances stay correct.</p></article>
     <article class="card feature"><p class="mono mono--accent">05</p><h3>Monthly reports</h3><p>Income, expense and spending by item for any month, with the same numbers the plan uses.</p></article>
     <article class="card feature"><p class="mono mono--accent">06</p><h3>Secured the way each platform allows</h3><p>Biometric sign-in, a PIN fallback and an inactivity lock, chosen by what the device can actually do.</p></article>
@@ -93,10 +98,67 @@
   </div>
   <div class="decisions">
     <div class="decision"><div><p class="mono mono--accent">Decision 01</p><h3>Local first, sync second</h3></div><p>Drift on SQLite holds the truth on the device; Supabase handles sign-in and realtime sync. Every screen reads from one local source, so the app is fast and works offline.</p></div>
-    <div class="decision"><div><p class="mono mono--accent">Decision 02</p><h3>One layout system for phone, tablet and web</h3></div><p>Window width alone picks the navigation: a bottom bar below 900dp, a rail from 900dp, a permanent sidebar from 1200dp. The thresholds live in one shared token set, and widget tests cover each layout.</p></div>
-    <div class="decision"><div><p class="mono mono--accent">Decision 03</p><h3>Security by capability, not by platform</h3></div><p>Biometrics where available. A phone without them gets a 6+ digit PIN with limited tries and an expiry. The web gets an inactivity lock plus the password, because a PIN would sit in the same browser storage as the session and add convenience, not protection.</p></div>
+    <div class="decision"><div><p class="mono mono--accent">Decision 02</p><h3>One layout system for phone, tablet and web</h3></div><p>Window width alone picks the layout, never the device type: a bottom bar on phones, a navigation rail from 600dp, and a capped content width on wide windows. The breakpoints live in one shared definition, and widget tests cover each layout. A permanent sidebar for large windows is specified for the redesign.</p></div>
+    <div class="decision"><div><p class="mono mono--accent">Decision 03</p><h3>Security by capability, not by platform</h3></div><p>Biometrics where available. A phone or tablet without them gets a six-digit PIN: obvious ones like 123456 are refused, five wrong tries invalidate it, and it expires after a year. The web gets an inactivity lock plus the password, because a PIN would sit in the same browser storage as the session and add convenience, not protection.</p></div>
     <div class="decision"><div><p class="mono mono--accent">Decision 04</p><h3>Corrections are new entries, never edits</h3></div><p>Changing a transaction posts a reversing entry and a new one. A reversed transaction stays in the history and can no longer be changed, which keeps every balance explainable.</p></div>
   </div>
+
+  <figure class="figure">
+    <div class="diagram-wrap" tabindex="0" role="region" aria-label="Diagram: how data moves in Finance (scrolls sideways on small screens)">
+      <svg class="diagram" viewBox="0 0 1000 270" role="img" aria-labelledby="flow-title flow-desc">
+        <title id="flow-title">How data moves in Finance</title>
+        <desc id="flow-desc">Screens read and write the local database immediately. Every write also goes into a sync outbox in the same transaction. The outbox is sent to Supabase in the background when the device is online. Remote changes come back into the local database through a realtime pull.</desc>
+        <defs><marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z"/></marker></defs>
+        <rect class="box" x="10" y="50" width="170" height="100" rx="14"/>
+        <text class="t" x="95" y="94" text-anchor="middle">Screens</text>
+        <text class="s" x="95" y="118" text-anchor="middle">Flutter, Riverpod</text>
+        <rect class="box box--core" x="280" y="50" width="170" height="100" rx="14"/>
+        <text class="t" x="365" y="86" text-anchor="middle">Local database</text>
+        <text class="s" x="365" y="108" text-anchor="middle">Drift on SQLite</text>
+        <text class="s" x="365" y="128" text-anchor="middle">source of truth</text>
+        <rect class="box" x="550" y="50" width="170" height="100" rx="14"/>
+        <text class="t" x="635" y="94" text-anchor="middle">Sync outbox</text>
+        <text class="s" x="635" y="118" text-anchor="middle">same transaction</text>
+        <rect class="box" x="820" y="50" width="170" height="100" rx="14"/>
+        <text class="t" x="905" y="86" text-anchor="middle">Supabase</text>
+        <text class="s" x="905" y="108" text-anchor="middle">Auth, Postgres</text>
+        <text class="s" x="905" y="128" text-anchor="middle">Realtime</text>
+        <line class="arrow" x1="188" y1="100" x2="272" y2="100" marker-start="url(#arr)" marker-end="url(#arr)"/>
+        <text class="l" x="230" y="84" text-anchor="middle">read, write</text>
+        <line class="arrow" x1="458" y1="100" x2="542" y2="100" marker-end="url(#arr)"/>
+        <text class="l" x="500" y="84" text-anchor="middle">queued</text>
+        <line class="arrow" x1="728" y1="100" x2="812" y2="100" marker-end="url(#arr)"/>
+        <text class="l" x="770" y="84" text-anchor="middle">when online</text>
+        <text class="l" x="770" y="124" text-anchor="middle">with retry</text>
+        <path class="arrow" d="M905 152 V218 H365 V158" marker-end="url(#arr)"/>
+        <text class="l" x="635" y="244" text-anchor="middle">realtime pull: remote changes land in the local database</text>
+      </svg>
+    </div>
+    <figcaption>How data moves. The UI never waits for the network: every read and write hits the local database first, and sync happens in the background.</figcaption>
+  </figure>
+
+  <figure class="figure">
+    <div class="devices">
+      <div class="device device--desktop">
+        <div class="frame-desktop">
+          <div class="frame-bar" aria-hidden="true"><i></i><i></i><i></i></div>
+          <img src="../assets/img/ks-desktop-overview-dark.png" width="2160" height="1350" loading="lazy" alt="Overview screen in a desktop-width window, dark theme: navigation rail on the left and the content centred at a capped width">
+        </div>
+        <p class="mono device-label">Desktop · rail, capped content width</p>
+      </div>
+      <div class="device device--tablet">
+        <div class="frame-tablet">
+          <img src="../assets/img/ks-tablet-overview.png" width="1536" height="1152" loading="lazy" alt="Overview screen in a tablet-width window: navigation rail on the left">
+        </div>
+        <p class="mono device-label">Tablet · rail</p>
+      </div>
+      <div class="device device--phone">
+        <img class="phone" src="../assets/img/ks-overview-light.png" width="820" height="1728" loading="lazy" alt="Overview screen on a phone: bottom navigation bar">
+        <p class="mono device-label">Phone · bottom bar</p>
+      </div>
+    </div>
+    <figcaption>One codebase, three layouts: the same Overview screen at 410, 1024 and 1440 logical pixels. Width alone decides the navigation and how wide the content may grow.</figcaption>
+  </figure>
 </section>
 
 <section class="section container" aria-labelledby="built-title">
@@ -108,7 +170,7 @@
   <div class="numbers">
     <div><div class="number">33</div><div class="number-label">feature specs, from budget envelopes to receipt scanning</div></div>
     <div><div class="number">1,900+</div><div class="number-label">automated tests across 205 test files</div></div>
-    <div><div class="number">~50k</div><div class="number-label">lines of Dart in 213 files</div></div>
+    <div><div class="number">~41k</div><div class="number-label">lines of hand-written Dart in 212 files, plus generated code</div></div>
     <div><div class="number">v1.9</div><div class="number-label">project constitution, amended with a rationale each time</div></div>
   </div>
   <div class="quotes">
