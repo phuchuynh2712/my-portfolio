@@ -990,11 +990,90 @@ h2 {
   gap: 24px;
   margin-top: 44px;
   align-items: start;
+  max-width: 560px;
 }
 
 .theme-grid .phone {
   width: 100%;
   filter: drop-shadow(0 20px 28px var(--shadow));
+}
+
+/* Process (single column) */
+.process-copy h2 {
+  max-width: 22ch;
+}
+
+.process-copy p {
+  max-width: 64ch;
+}
+
+.process-copy .proof {
+  margin-top: 28px;
+  max-width: none;
+}
+
+.process-copy .process-link {
+  margin-top: 24px;
+  font-weight: 600;
+}
+
+/* About */
+.about {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 40px clamp(32px, 5vw, 72px);
+}
+
+.about img {
+  flex: 0 0 auto;
+  width: min(280px, 100%);
+  height: auto;
+  display: block;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: #ffffff;
+}
+
+.about-text {
+  flex: 1 1 420px;
+  min-width: 0;
+}
+
+.about-text h2 {
+  margin-top: 14px;
+}
+
+.about-text p + p {
+  margin-top: 16px;
+}
+
+.about-text p:not(.mono) {
+  margin-top: 20px;
+  color: var(--dim);
+  max-width: 60ch;
+  text-wrap: pretty;
+}
+
+.about-text p:not(.mono) + p {
+  margin-top: 16px;
+}
+
+/* Contact additions */
+.contact-note {
+  margin-top: 20px;
+  color: var(--hero-dim);
+  font-size: 18px;
+}
+
+.btn--light {
+  background: #ffffff;
+  color: #073d28;
+}
+
+.btn--light:hover {
+  background: #e3e9e6;
+  color: #073d28;
 }
 
 /* Plain text pages */
